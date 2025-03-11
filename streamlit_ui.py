@@ -129,3 +129,37 @@ if st.sidebar.button("Get Workloads and Images"):
         #st.download_button("Download Workload Data", csv_workloads, f"workloads_{selected_cluster}_{selected_namespace}.csv", "text/csv", key="namespace")
     else:
         st.warning(f"No workloads found in namespace: {selected_namespace}")
+
+def get_filtered_workloads_and_images(cluster, namespace):
+    """
+    Fetch workloads and images for the selected cluster and namespace.
+    
+    Args:
+        cluster (str): Selected cluster name.
+        namespace (str): Selected namespace.
+    
+    Returns:
+        pd.DataFrame: DataFrame containing workloads and images.
+    """
+    if not cluster or not namespace:
+        st.warning("Cluster and Namespace must be selected.")
+        return pd.DataFrame()
+
+    df_workloads = get_workloads(namespace)
+    
+    if df_workloads.empty:
+        st.warning(f"No workloads found in namespace: {namespace}")
+    else:
+        st.write(f"### Workloads and Images for Namespace: {namespace}")
+        st.dataframe(df_workloads)
+        
+        csv_workloads = df_workloads.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            "Download Workload Data", 
+            csv_workloads, 
+            f"workloads_{cluster}_{namespace}.csv", 
+            "text/csv", 
+            key="namespace"
+        )
+    
+    return df_workloads
